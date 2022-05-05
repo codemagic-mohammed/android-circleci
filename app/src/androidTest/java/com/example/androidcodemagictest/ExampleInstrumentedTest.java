@@ -1,4 +1,4 @@
-package com.example.androidcodemagictest;
+package com.mohammed.androidcodemagictest;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.example.androidcodemagictest", appContext.getPackageName());
+        assertEquals("com.mohammed.androidcodemagictest", appContext.getPackageName());
     }
 }

@@ -1,4 +1,4 @@
-package com.example.androidcodemagictest.ui.dashboard;
+package com.mohammed.androidcodemagictest.ui.dashboard;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -10,7 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.androidcodemagictest.databinding.FragmentDashboardBinding;
+import com.mohammed.androidcodemagictest.databinding.FragmentDashboardBinding;
 
 public class DashboardFragment extends Fragment {
 

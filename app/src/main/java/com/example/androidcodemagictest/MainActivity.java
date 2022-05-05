@@ -1,4 +1,4 @@
-package com.example.androidcodemagictest;
+package com.mohammed.androidcodemagictest;
 
 import android.os.Bundle;
 
@@ -10,7 +10,7 @@ import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
-import com.example.androidcodemagictest.databinding.ActivityMainBinding;
+import com.mohammed.androidcodemagictest.databinding.ActivityMainBinding;
 
 public class MainActivity extends AppCompatActivity {
 

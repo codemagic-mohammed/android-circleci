@@ -1,4 +1,4 @@
-package com.example.androidcodemagictest;
+package com.mohammed.androidcodemagictest;
 
 import org.junit.Test;
 

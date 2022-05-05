@@ -1,4 +1,4 @@
-package com.example.androidcodemagictest.ui.dashboard;
+package com.mohammed.androidcodemagictest.ui.dashboard;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

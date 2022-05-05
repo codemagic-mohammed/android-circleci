@@ -1,4 +1,4 @@
-package com.example.androidcodemagictest.ui.notifications;
+package com.mohammed.androidcodemagictest.ui.notifications;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

@@ -1,4 +1,4 @@
-package com.example.androidcodemagictest.ui.home;
+package com.mohammed.androidcodemagictest.ui.home;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
