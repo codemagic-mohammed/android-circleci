@@ -18,13 +18,19 @@ workflows:
         - push
       branch_patterns:
         - pattern: master
-          include: true
-          source: true
         - pattern: develop
           include: false
+      cancel_previous_builds: false
     scripts:
-      - name: Echo the current working directory
-        script: echo "CM_BUILD_DIR = $CM_BUILD_DIR"
+      - name: Check the env variable
+        script: |
+          echo "CM_BUILD_DIR = $CM_BUILD_DIR"
+          echo "CM_KEYSTORE = $CM_KEYSTORE"
+          echo "CM_KEY_ALIAS = $CM_KEY_ALIAS"
+          echo "CM_KEY_PASSWORD = $CM_KEY_PASSWORD"
+          echo "CM_KEYSTORE_PASSWORD = $CM_KEYSTORE_PASSWORD"
+          echo "CM_KEYSTORE_PATH = $CM_KEYSTORE_PATH"
+          echo "Listing directories $(ls)"
       - name: Set up key.properties file for code signing
         script: |
           echo $CM_KEYSTORE | base64 --decode > $CM_KEYSTORE_PATH
