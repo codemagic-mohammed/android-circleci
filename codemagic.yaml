@@ -8,11 +8,13 @@ workflows:
         - $HOME/.gradle/caches
     environment:
       groups:
-        - codemagic_test_keystore_cred # <-- Includes - CM_KEYSTORE, CM_KEYSTORE_PASSWORD, CM_KEY_PASSWORD, CM_KEY_ALIAS
+        # - codemagic_test_keystore_cred # <-- Includes - CM_KEYSTORE, CM_KEYSTORE_PASSWORD, CM_KEY_PASSWORD, CM_KEY_ALIAS
         - google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
       # Add the group environment variables in Codemagic UI (either in Application/Team variables) - https://docs.codemagic.io/variables/environment-variable-groups/
       vars:
         CM_KEYSTORE_PATH: /tmp/keystore.keystore
+      android_signing:
+        - codemagic_test
       node: latest
     triggering:
       events:
@@ -61,10 +63,10 @@ workflows:
       slack:
         channel: "#test-codemagic1"
         notify_on_build_start: true
-      google_play: # For Android app
-        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS # Contents of the JSON key file for Google Play service account saved as a secure environment variable
-        track: internal # Name of the track internal, alpha, beta, production, internal app sharing, or your custom track name
-        # in_app_update_priority: 3 # Optional Priority of the release (only set if in-app updates are supported): integer in range [0, 5]
-        # rollout_fraction: 0.25 # Optional. Rollout fraction (set only if releasing to a fraction of users): value between (0, 1)
-        changes_not_sent_for_review: false # Optional boolean To be used ONLY if your app cannot be sent for review automatically *
-        submit_as_draft: true # Optional boolean. Publish artifacts under a draft release. Can not be used together with rollout_fraction. Defaults to false
+      # google_play: # For Android app
+      #   credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS # Contents of the JSON key file for Google Play service account saved as a secure environment variable
+      #   track: internal # Name of the track internal, alpha, beta, production, internal app sharing, or your custom track name
+      #   # in_app_update_priority: 3 # Optional Priority of the release (only set if in-app updates are supported): integer in range [0, 5]
+      #   # rollout_fraction: 0.25 # Optional. Rollout fraction (set only if releasing to a fraction of users): value between (0, 1)
+      #   changes_not_sent_for_review: false # Optional boolean To be used ONLY if your app cannot be sent for review automatically *
+      #   submit_as_draft: true # Optional boolean. Publish artifacts under a draft release. Can not be used together with rollout_fraction. Defaults to false
