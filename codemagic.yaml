@@ -33,21 +33,20 @@ workflows:
           echo "Listing directories $(ls)"
       - name: Set up key.properties file for code signing
         script: |
+          #!/usr/bin/env zsh 
           echo $CM_KEYSTORE | base64 --decode > $CM_KEYSTORE_PATH
           cat >> "$CM_BUILD_DIR/key.properties" <<EOF
           storePassword=$CM_KEYSTORE_PASSWORD
           keyPassword=$CM_KEY_PASSWORD
           keyAlias=$CM_KEY_ALIAS
           storeFile=$CM_KEYSTORE_PATH
-          EOF          
+          EOF
       - name: Set up local properties
         script: echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
       - name: Build aab Android app
-        script: 
-          ./gradlew bundleRelease  # To generate an .apk use--> ./gradlew assembleRelease
+        script: ./gradlew bundleRelease # To generate an .apk use--> ./gradlew assembleRelease
       - name: Build apk Android app
-        script: 
-          ./gradlew assembleRelease  # To generate an .apk use--> ./gradlew assembleRelease
+        script: ./gradlew assembleRelease # To generate an .apk use--> ./gradlew assembleRelease
       - name: Check app cert
         script: jarsigner -verify -verbose -certs $FCI_BUILD_OUTPUT_DIR/*.apk
     artifacts:
@@ -61,7 +60,7 @@ workflows:
           success: false
           failure: false
       slack:
-        channel: '#test-codemagic1'
+        channel: "#test-codemagic1"
         notify_on_build_start: true
     #   google_play:
     #     credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
