@@ -17,9 +17,7 @@ workflows:
       events:
         - push
       branch_patterns:
-        - pattern: master
-        - pattern: develop
-          include: false
+        - pattern: *
       cancel_previous_builds: false
     scripts:
       - name: Set up key.properties file for code signing
@@ -39,7 +37,7 @@ workflows:
       - name: Build aab Android app
         script: |
           #!/usr/bin/env zsh 
-          chmod +x gradlew
+          chmod +x gradlew # because the gradlew was denied
           ./gradlew bundleRelease # To generate an .apk use--> ./gradlew assembleRelease
       - name: Build apk Android app
         script: |
@@ -48,7 +46,7 @@ workflows:
       - name: Check app cert
         script: |
           #!/usr/bin/env zsh 
-          jarsigner -verify -verbose -certs $FCI_BUILD_OUTPUT_DIR/*.apk
+          jarsigner -verify -verbose -certs app/build/outputs/**/**/*.apk
     artifacts:
       - app/build/outputs/**/**/*.aab
       - app/build/outputs/**/**/*.apk
