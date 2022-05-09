@@ -22,15 +22,6 @@ workflows:
           include: false
       cancel_previous_builds: false
     scripts:
-      - name: Check the env variable
-        script: |
-          echo "CM_BUILD_DIR = $CM_BUILD_DIR"
-          echo "CM_KEYSTORE = $CM_KEYSTORE"
-          echo "CM_KEY_ALIAS = $CM_KEY_ALIAS"
-          echo "CM_KEY_PASSWORD = $CM_KEY_PASSWORD"
-          echo "CM_KEYSTORE_PASSWORD = $CM_KEYSTORE_PASSWORD"
-          echo "CM_KEYSTORE_PATH = $CM_KEYSTORE_PATH"
-          echo "Listing directories $(ls)"
       - name: Set up key.properties file for code signing
         script: |
           #!/usr/bin/env zsh 
@@ -42,13 +33,21 @@ workflows:
           storeFile=$CM_KEYSTORE_PATH
           EOF
       - name: Set up local properties
-        script: echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+        script: |
+          #!/usr/bin/env zsh 
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
       - name: Build aab Android app
-        script: ./gradlew bundleRelease # To generate an .apk use--> ./gradlew assembleRelease
+        script: |
+          #!/usr/bin/env zsh 
+          ./gradlew bundleRelease # To generate an .apk use--> ./gradlew assembleRelease
       - name: Build apk Android app
-        script: ./gradlew assembleRelease # To generate an .apk use--> ./gradlew assembleRelease
+        script: |
+          #!/usr/bin/env zsh 
+          ./gradlew assembleRelease # To generate an .apk use--> ./gradlew assembleRelease
       - name: Check app cert
-        script: jarsigner -verify -verbose -certs $FCI_BUILD_OUTPUT_DIR/*.apk
+        script: |
+          #!/usr/bin/env zsh 
+          jarsigner -verify -verbose -certs $FCI_BUILD_OUTPUT_DIR/*.apk
     artifacts:
       - app/build/outputs/**/**/*.aab
       - app/build/outputs/**/**/*.apk
