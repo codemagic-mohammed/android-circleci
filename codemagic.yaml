@@ -95,6 +95,7 @@ workflows:
       - name: Build, increment the build number and publish to the store
         script: |
           #!/usr/bin/env zsh 
+          chmod +x gradlew # because the gradlew was denied
           bundle install
           bundle exec fastlane release
 
