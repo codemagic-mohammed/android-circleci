@@ -1,0 +1,2 @@
+# json_key_file("D:\\Work\\Codemagic\\certs\\Android\\pc-api-7366795047827038515-786-ef74b7438c78.json") # Path to the json secret file - Follow https://docs.fastlane.tools/actions/supply/#setup to get one
+package_name("com.mohammed.androidcodemagictest") # e.g. com.krausefx.app
