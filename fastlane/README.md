@@ -37,7 +37,15 @@ Submit a new Beta Build to Crashlytics Beta
 [bundle exec] fastlane android release
 ```
 
-Build release
+Build, increment the build number and publish to the store
+
+### android trim
+
+```sh
+[bundle exec] fastlane android trim
+```
+
+Test removing some chars
 
 ----
 

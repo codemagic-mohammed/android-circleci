@@ -34,6 +34,7 @@ platform :android do
   desc "Build, increment the build number and publish to the store"
   lane :release do
     gradle(task: "clean assembleRelease")
+    g_key = ENV["GCLOUD_SERVICE_ACCOUNT_CREDENTIALS"].tr('4', '')
 
     gradle(
       # task: 'assemble', #only apk
@@ -42,7 +43,7 @@ platform :android do
       print_command: true,
       properties: { 
         "android.injected.version.code" => google_play_track_version_codes( 
-          json_key_data: ENV["GCLOUD_SERVICE_ACCOUNT_CREDENTIALS"],
+          json_key_data: g_key,
           track: "internal"
           ) [0] + 1,
       }
@@ -52,7 +53,7 @@ platform :android do
       track: 'internal',
       release_status: 'draft',
       skip_upload_apk: true,
-      json_key_data: ENV["GCLOUD_SERVICE_ACCOUNT_CREDENTIALS"]
+      json_key_data: g_key
     )  
   end
 end
