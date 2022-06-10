@@ -16,6 +16,12 @@
 default_platform(:android)
 
 platform :android do
+
+  desc "Clean assembleRelease"
+  lane :clean do
+    gradle(task: "clean assembleRelease")
+  end
+
   desc "Runs all the tests"
   lane :test do
     gradle(task: "test")
