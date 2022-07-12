@@ -92,35 +92,35 @@ workflows:
       #   # rollout_fraction: 0.25 # Optional. Rollout fraction (set only if releasing to a fraction of users): value between (0, 1)
       #   changes_not_sent_for_review: false # Optional boolean To be used ONLY if your app cannot be sent for review automatically *
       #   submit_as_draft: true # Optional boolean. Publish artifacts under a draft release. Can not be used together with rollout_fraction. Defaults to false
-  android-fastlane:
-    name: Android Fastlane
-    max_build_duration: 60
-    instance_type: linux_x2
-    environment:
-      groups:
-        # - google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
-        - keys # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
-      android_signing:
-        - codemagic_test
-      node: latest
-    triggering:
-      events:
-        - push
-      branch_patterns:
-        - pattern: "*"
-          include: false
-    scripts:
-      - name: Set up local properties
-        script: |
-          #!/usr/bin/env zsh 
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
-      - bundle install
-      - name: Build, increment the build number and publish to the store
-        script: |
-          #!/usr/bin/env zsh 
-          chmod +x gradlew # because the gradlew was denied
-          bundle exec fastlane release
+  # android-fastlane:
+  #   name: Android Fastlane
+  #   max_build_duration: 60
+  #   instance_type: linux_x2
+  #   environment:
+  #     groups:
+  #       # - google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
+  #       - keys # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
+  #     android_signing:
+  #       - codemagic_test
+  #     node: latest
+  #   triggering:
+  #     events:
+  #       - push
+  #     branch_patterns:
+  #       - pattern: "*"
+  #         include: false
+  #   scripts:
+  #     - name: Set up local properties
+  #       script: |
+  #         #!/usr/bin/env zsh
+  #         echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+  #     - bundle install
+  #     - name: Build, increment the build number and publish to the store
+  #       script: |
+  #         #!/usr/bin/env zsh
+  #         chmod +x gradlew # because the gradlew was denied
+  #         bundle exec fastlane release
 
-    artifacts:
-      - app/build/outputs/**/**/*.aab
-      - app/build/outputs/**/**/*.apk
+  #   artifacts:
+  #     - app/build/outputs/**/**/*.aab
+  #     - app/build/outputs/**/**/*.apk
