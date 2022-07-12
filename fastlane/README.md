@@ -15,6 +15,14 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## Android
 
+### android clean
+
+```sh
+[bundle exec] fastlane android clean
+```
+
+Clean assembleRelease
+
 ### android test
 
 ```sh
@@ -38,14 +46,6 @@ Submit a new Beta Build to Crashlytics Beta
 ```
 
 Build, increment the build number and publish to the store
-
-### android trim
-
-```sh
-[bundle exec] fastlane android trim
-```
-
-Test removing some chars
 
 ----
 
