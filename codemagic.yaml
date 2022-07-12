@@ -64,7 +64,7 @@ workflows:
               export IPA_LINK=$(echo $FCI_ARTIFACT_LINKS | jq '.[0] | .url')
               export ENCODED_APK_LINK=$(jq -rn --arg x $APK_LINK '$x|@uri')
               export ENCODED_IPA_LINK=$(jq -rn --arg x $IPA_LINK '$x|@uri')
-              read -r -d '' COMMENT << EOM
+              read -r -d '' COMMENT << 'EOM'
               Generated builds by [Codemagic](https://codemagic.io/app/$FCI_PROJECT_ID/build/$FCI_BUILD_ID) for commit \`$FCI_COMMIT\`
               | Android | iOS |
               |:-:|:-:|
