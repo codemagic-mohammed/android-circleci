@@ -65,7 +65,7 @@ workflows:
               export ENCODED_APK_LINK=$(jq -rn --arg x $APK_LINK '$x|@uri')
               export ENCODED_IPA_LINK=$(jq -rn --arg x $IPA_LINK '$x|@uri')
               read -r -d '' COMMENT << EOM
-              Generated builds by [Codemagic](https://codemagic.io/app/$FCI_PROJECT_ID/build/$FCI_BUILD_ID) for commit \`$FCI_COMMIT\` ⬇
+              Generated builds by [Codemagic](https://codemagic.io/app/$FCI_PROJECT_ID/build/$FCI_BUILD_ID) for commit \`$FCI_COMMIT\`
               | Android | iOS |
               |:-:|:-:|
               | ![image](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=$ENCODED_APK_LINK) <br /> [Download-Link]($(echo "$APK_LINK" | tr -d '"')) | ![image](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=$ENCODED_IPA_LINK) <br /> [Download-Link]($(echo "$IPA_LINK" | tr -d '"')) |
