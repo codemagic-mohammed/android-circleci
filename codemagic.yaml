@@ -28,7 +28,7 @@ workflows:
         script: |
           # !/usr/bin/env zsh 
           # echo $CM_KEYSTORE | base64 --decode > $CM_KEYSTORE_PATH
-          cat >> "$CM_BUILD_DIR/key.properties" <<EOF
+          cat >> "$CM_BUILD_DIR/keystore.properties" <<EOF
           storePassword=$CM_KEYSTORE_PASSWORD
           keyPassword=$CM_KEY_PASSWORD
           keyAlias=$CM_KEY_ALIAS
@@ -64,12 +64,12 @@ workflows:
               export IPA_LINK=$(echo $FCI_ARTIFACT_LINKS | jq '.[0] | .url')
               export ENCODED_APK_LINK=$(jq -rn --arg x $APK_LINK '$x|@uri')
               export ENCODED_IPA_LINK=$(jq -rn --arg x $IPA_LINK '$x|@uri')
-              read -r -d '' COMMENT << 'EOM'
+              read -r -d '' COMMENT << EOM
               Generated builds by [Codemagic](https://codemagic.io/app/$FCI_PROJECT_ID/build/$FCI_BUILD_ID) for commit \`$FCI_COMMIT\`
               | Android | iOS |
               |:-:|:-:|
               | ![image](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=$ENCODED_APK_LINK) <br /> [Download-Link]($(echo "$APK_LINK" | tr -d '"')) | ![image](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=$ENCODED_IPA_LINK) <br /> [Download-Link]($(echo "$IPA_LINK" | tr -d '"')) |
-              EOM
+                EOM
               # gh pr comment $FCI_PULL_REQUEST_NUMBER -b "$COMMENT"
               echo "COMMENT: $COMMENT"
             else
