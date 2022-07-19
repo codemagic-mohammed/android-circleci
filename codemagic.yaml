@@ -42,7 +42,7 @@ workflows:
         script: |
           #!/usr/bin/env zsh 
           chmod +x gradlew # because the gradlew was denied
-          ./gradlew bundleRelease # To generate an .apk use--> ./gradlew assembleRelease
+          # ./gradlew bundleRelease # To generate an .apk use--> ./gradlew assembleRelease
       - name: Build apk Android app
         script: |
           #!/usr/bin/env zsh
@@ -54,44 +54,43 @@ workflows:
     artifacts:
       - app/build/outputs/**/**/*.aab
       - app/build/outputs/**/**/*.apk
-    publishing:
-      scripts:
-        - name: Check read
-          script: |
-            if [[ $FCI_ARTIFACT_LINKS ]] ; then
-              echo "There's a artifacts."
-              export APK_LINK=$(echo $FCI_ARTIFACT_LINKS | jq '.[1] | .url')
-              export IPA_LINK=$(echo $FCI_ARTIFACT_LINKS | jq '.[0] | .url')
-              export ENCODED_APK_LINK=$(jq -rn --arg x $APK_LINK '$x|@uri')
-              export ENCODED_IPA_LINK=$(jq -rn --arg x $IPA_LINK '$x|@uri')
-              read -r -d '' COMMENT << EOM
-              Generated builds by [Codemagic](https://codemagic.io/app/$FCI_PROJECT_ID/build/$FCI_BUILD_ID) for commit \`$FCI_COMMIT\`
-              | Android | iOS |
-              |:-:|:-:|
-              | ![image](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=$ENCODED_APK_LINK) <br /> [Download-Link]($(echo "$APK_LINK" | tr -d '"')) | ![image](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=$ENCODED_IPA_LINK) <br /> [Download-Link]($(echo "$IPA_LINK" | tr -d '"')) |
-            EOM
-              # gh pr comment $FCI_PULL_REQUEST_NUMBER -b "$COMMENT"
-              echo "COMMENT: $COMMENT"
-            else
-               echo "There is no artifacts to publish cause of build failure"
-            fi
+    # publishing:
+    #   scripts:
+    #     - name: Check read
+    #       script: |
+    #         if [[ $FCI_ARTIFACT_LINKS ]] ; then
+    #           export APK_LINK=$(echo $FCI_ARTIFACT_LINKS | jq '.[1] | .url')
+    #           export IPA_LINK=$(echo $FCI_ARTIFACT_LINKS | jq '.[0] | .url')
+    #           export ENCODED_APK_LINK=$(jq -rn --arg x $APK_LINK '$x|@uri')
+    #           export ENCODED_IPA_LINK=$(jq -rn --arg x $IPA_LINK '$x|@uri')
+    #           read -r -d '' COMMENT << EOM
+    #           Generated builds by [Codemagic](https://codemagic.io/app/$FCI_PROJECT_ID/build/$FCI_BUILD_ID) for commit \`$FCI_COMMIT\`
+    #           | Android | iOS |
+    #           |:-:|:-:|
+    #           | ![image](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=$ENCODED_APK_LINK) <br /> [Download-Link]($(echo "$APK_LINK" | tr -d '"')) | ![image](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=$ENCODED_IPA_LINK) <br /> [Download-Link]($(echo "$IPA_LINK" | tr -d '"')) |
+    #         EOM
+    #           # gh pr comment $FCI_PULL_REQUEST_NUMBER -b "$COMMENT"
+    #           echo "COMMENT: $COMMENT"
+    #         else
+    #            echo "There is no artifacts to publish cause of build failure"
+    #         fi
 
-      # email:
-      #   recipients:
-      #     - mohammed@nevercode.io
-      #   notify:
-      #     success: false
-      #     failure: false
-      # slack:
-      #   channel: "#test-codemagic1"
-      #   notify_on_build_start: true
-      # google_play: # For Android app
-      #   credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS # Contents of the JSON key file for Google Play service account saved as a secure environment variable
-      #   track: internal # Name of the track internal, alpha, beta, production, internal app sharing, or your custom track name
-      #   # in_app_update_priority: 3 # Optional Priority of the release (only set if in-app updates are supported): integer in range [0, 5]
-      #   # rollout_fraction: 0.25 # Optional. Rollout fraction (set only if releasing to a fraction of users): value between (0, 1)
-      #   changes_not_sent_for_review: false # Optional boolean To be used ONLY if your app cannot be sent for review automatically *
-      #   submit_as_draft: true # Optional boolean. Publish artifacts under a draft release. Can not be used together with rollout_fraction. Defaults to false
+    # email:
+    #   recipients:
+    #     - mohammed@nevercode.io
+    #   notify:
+    #     success: false
+    #     failure: false
+    # slack:
+    #   channel: "#test-codemagic1"
+    #   notify_on_build_start: true
+    # google_play: # For Android app
+    #   credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS # Contents of the JSON key file for Google Play service account saved as a secure environment variable
+    #   track: internal # Name of the track internal, alpha, beta, production, internal app sharing, or your custom track name
+    #   # in_app_update_priority: 3 # Optional Priority of the release (only set if in-app updates are supported): integer in range [0, 5]
+    #   # rollout_fraction: 0.25 # Optional. Rollout fraction (set only if releasing to a fraction of users): value between (0, 1)
+    #   changes_not_sent_for_review: false # Optional boolean To be used ONLY if your app cannot be sent for review automatically *
+    #   submit_as_draft: true # Optional boolean. Publish artifacts under a draft release. Can not be used together with rollout_fraction. Defaults to false
   # android-fastlane:
   #   name: Android Fastlane
   #   max_build_duration: 60
@@ -124,12 +123,3 @@ workflows:
   #   artifacts:
   #     - app/build/outputs/**/**/*.aab
   #     - app/build/outputs/**/**/*.apk
-
-# #!/usr/bin/env bash
-# if [[ $((11 > 2)) ]] ; then
-#   echo "There's a artifacts."
-#   read -r -d '' COMMENT << EOM
-#   EOM
-# else
-#   echo "There is no artifacts to publish cause of build failure"
-# fi
