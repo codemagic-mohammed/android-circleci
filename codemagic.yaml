@@ -42,11 +42,11 @@ workflows:
         script: |
           #!/usr/bin/env zsh 
           chmod +x gradlew # because the gradlew was denied
-          # ./gradlew bundleRelease # To generate an .apk use--> ./gradlew assembleRelease
-      - name: Build apk Android app
-        script: |
-          #!/usr/bin/env zsh
-          ./gradlew assembleRelease
+          ./gradlew bundleRelease # To generate an .apk use--> ./gradlew assembleRelease
+      # - name: Build apk Android app
+      #   script: |
+      #     #!/usr/bin/env zsh
+      #     ./gradlew assembleRelease
       # - name: Check app cert
       #   script: |
       #     #!/usr/bin/env zsh
