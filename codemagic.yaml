@@ -11,8 +11,10 @@ workflows:
         # Add the group environment variables in Codemagic UI (either in Application/Team variables) - https://docs.codemagic.io/variables/environment-variable-groups/
         # - codemagic_test_keystore_cred # <-- Includes - CM_KEYSTORE, CM_KEYSTORE_PASSWORD, CM_KEY_PASSWORD, CM_KEY_ALIAS
         - google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
+        - app_gallery # <-- (Includes CLIENT_ID, CLIENT_SECRET, APP_ID)
       vars:
         CM_KEYSTORE_PATH: /tmp/keystore.keystore
+        SUFFIX: "aab" # What kind of android app you're trying to publish to AppGallery (apk or aab)
       android_signing:
         - codemagic_test
       node: latest
@@ -54,36 +56,105 @@ workflows:
     artifacts:
       - app/build/outputs/**/**/*.aab
       - app/build/outputs/**/**/*.apk
-    # publishing:
-    #   scripts:
-    #     - name: Check read
-    #       script: |
-    #         if [[ $FCI_ARTIFACT_LINKS ]] ; then
-    #           export APK_LINK=$(echo $FCI_ARTIFACT_LINKS | jq '.[1] | .url')
-    #           export IPA_LINK=$(echo $FCI_ARTIFACT_LINKS | jq '.[0] | .url')
-    #           export ENCODED_APK_LINK=$(jq -rn --arg x $APK_LINK '$x|@uri')
-    #           export ENCODED_IPA_LINK=$(jq -rn --arg x $IPA_LINK '$x|@uri')
-    #           read -r -d '' COMMENT << EOM
-    #           Generated builds by [Codemagic](https://codemagic.io/app/$FCI_PROJECT_ID/build/$FCI_BUILD_ID) for commit \`$FCI_COMMIT\`
-    #           | Android | iOS |
-    #           |:-:|:-:|
-    #           | ![image](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=$ENCODED_APK_LINK) <br /> [Download-Link]($(echo "$APK_LINK" | tr -d '"')) | ![image](https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=$ENCODED_IPA_LINK) <br /> [Download-Link]($(echo "$IPA_LINK" | tr -d '"')) |
-    #         EOM
-    #           # gh pr comment $FCI_PULL_REQUEST_NUMBER -b "$COMMENT"
-    #           echo "COMMENT: $COMMENT"
-    #         else
-    #            echo "There is no artifacts to publish cause of build failure"
-    #         fi
+    publishing:
+      scripts:
+        - name: Publish to AppGallery
+          script: |
+            #First get the accessToken
+            res=$(curl --location --request POST 'https://connect-api.cloud.huawei.com/api/oauth2/v1/token' \
+            --header 'Content-Type: application/json' \
+            --data-raw '{
+                "client_id": "'$CLIENT_ID'",
+                "client_secret": "'$CLIENT_SECRET'",
+                "grant_type": "client_credentials"
+            }')
 
-    # email:
-    #   recipients:
-    #     - mohammed@nevercode.io
-    #   notify:
-    #     success: false
-    #     failure: false
-    # slack:
-    #   channel: "#test-codemagic1"
-    #   notify_on_build_start: true
+            token=$(echo $res | jq -r '.access_token')
+
+            if [[ "$token" == null ]]
+            then
+                echo $(echo $res | jq -r '.ret.msg')
+                exit 1
+            fi
+
+            #Get the upload URL and upload your app
+            res=$(curl --location --request GET 'https://connect-api.cloud.huawei.com/api/publish/v2/upload-url?appId='$APP_ID'&suffix='$SUFFIX'' \
+            --header 'client_id: '$CLIENT_ID'' \
+            --header 'Authorization: Bearer '$token'')
+
+            uploadUrl=$(echo $res | jq -r '.uploadUrl')
+            authCode=$(echo $res | jq -r '.authCode')
+            code=$(echo $res | jq -r '.ret.code')
+
+            if [ $code -ne 0 ]
+            then
+                echo $(echo $res | jq -r '.ret.msg')
+                exit 1
+            fi
+
+            res=$(curl --location --request POST 'https://developerfile7.hicloud.com:443/FileServer/uploadFile' \
+            --header 'client_id: '$CLIENT_ID'' \
+            --header 'Authorization: Bearer '$token'' \
+            --form 'authCode="'$authCode'"' \
+            --form 'fileCount="1"' \
+            --form 'file=@"app/build/outputs/**/**/*.aab"')
+
+            fileDestUrl=$(echo $res | jq -r '.result.UploadFileRsp.fileInfoList[0].fileDestUlr')
+            code=$(echo $res | jq -r '.result.resultCode')
+
+            if [ $code -ne 0 ]
+            then
+                echo $(echo $res | jq '.result.CException')
+                exit 1
+            fi
+
+
+            res=$(curl --location --request PUT 'https://connect-api.cloud.huawei.com/api/publish/v2/app-file-info?appId='$APP_ID'' \
+            --header 'client_id: '$CLIENT_ID'' \
+            --header 'Authorization: Bearer '$token'' \
+            --header 'Content-Type: application/json' \
+            --data-raw '{
+                "fileType": 5,
+                "files": {
+                    "fileName": "GalleryMagic-CM.aab",
+                    "fileDestUrl": "'$fileDestUrl'"
+                }
+            }')
+
+            code=$(echo $res | jq -r '.ret.code')
+
+            if [ $code -eq 0 ]
+            then
+                echo "File uploaded successfully."
+            else
+                echo $(echo $res | jq -r '.ret.msg')
+                exit 1
+            fi
+
+            #Submit for review
+            res=$(curl --location --request POST 'https://connect-api.cloud.huawei.com/api/publish/v2/app-submit?appId='$APP_ID'' \
+            --header 'client_id: '$CLIENT_ID'' \
+            --header 'Authorization: Bearer '$token'')
+
+            code=$(echo $res | jq -r '.ret.code')
+
+            if [ $code -eq 0 ]
+            then
+                echo "Submitted for review successfully."
+            else
+                echo $(echo $res | jq -r '.ret.msg')
+                exit 1
+            fi
+
+      # email:
+      #   recipients:
+      #     - mohammed@nevercode.io
+      #   notify:
+      #     success: false
+      #     failure: false
+      slack:
+        channel: "#test-codemagic1"
+        notify_on_build_start: true
     # google_play: # For Android app
     #   credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS # Contents of the JSON key file for Google Play service account saved as a secure environment variable
     #   track: internal # Name of the track internal, alpha, beta, production, internal app sharing, or your custom track name
@@ -91,35 +162,35 @@ workflows:
     #   # rollout_fraction: 0.25 # Optional. Rollout fraction (set only if releasing to a fraction of users): value between (0, 1)
     #   changes_not_sent_for_review: false # Optional boolean To be used ONLY if your app cannot be sent for review automatically *
     #   submit_as_draft: true # Optional boolean. Publish artifacts under a draft release. Can not be used together with rollout_fraction. Defaults to false
-  # android-fastlane:
-  #   name: Android Fastlane
-  #   max_build_duration: 60
-  #   instance_type: linux_x2
-  #   environment:
-  #     groups:
-  #       # - google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
-  #       - keys # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
-  #     android_signing:
-  #       - codemagic_test
-  #     node: latest
-  #   triggering:
-  #     events:
-  #       - push
-  #     branch_patterns:
-  #       - pattern: "*"
-  #         include: false
-  #   scripts:
-  #     - name: Set up local properties
-  #       script: |
-  #         #!/usr/bin/env zsh
-  #         echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
-  #     - bundle install
-  #     - name: Build, increment the build number and publish to the store
-  #       script: |
-  #         #!/usr/bin/env zsh
-  #         chmod +x gradlew # because the gradlew was denied
-  #         bundle exec fastlane release
+  android-fastlane:
+    name: Android Fastlane
+    max_build_duration: 60
+    instance_type: linux_x2
+    environment:
+      groups:
+        # - google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
+        - keys # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
+      android_signing:
+        - codemagic_test
+      node: latest
+    triggering:
+      events:
+        - push
+      branch_patterns:
+        - pattern: "*"
+          include: false
+    scripts:
+      - name: Set up local properties
+        script: |
+          #!/usr/bin/env zsh
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+      - bundle install
+      - name: Build, increment the build number and publish to the store
+        script: |
+          #!/usr/bin/env zsh
+          chmod +x gradlew # because the gradlew was denied
+          bundle exec fastlane release
 
-  #   artifacts:
-  #     - app/build/outputs/**/**/*.aab
-  #     - app/build/outputs/**/**/*.apk
+    artifacts:
+      - app/build/outputs/**/**/*.aab
+      - app/build/outputs/**/**/*.apk
