@@ -97,7 +97,7 @@ workflows:
             --header 'Authorization: Bearer '$token'' \
             --form 'authCode="'$authCode'"' \
             --form 'fileCount="1"' \
-            --form 'file=@"app/build/outputs/**/**/*.aab"')
+            --form 'file=@""'$CM_BUILD_DIR'/app/build/outputs/bundle/release/app-release.aab""')
 
             fileDestUrl=$(echo $res | jq -r '.result.UploadFileRsp.fileInfoList[0].fileDestUlr')
             code=$(echo $res | jq -r '.result.resultCode')
@@ -107,7 +107,6 @@ workflows:
                 echo $(echo $res | jq '.result.CException')
                 exit 1
             fi
-
 
             res=$(curl --location --request PUT 'https://connect-api.cloud.huawei.com/api/publish/v2/app-file-info?appId='$APP_ID'' \
             --header 'client_id: '$CLIENT_ID'' \
@@ -131,20 +130,21 @@ workflows:
                 exit 1
             fi
 
-            #Submit for review
-            res=$(curl --location --request POST 'https://connect-api.cloud.huawei.com/api/publish/v2/app-submit?appId='$APP_ID'' \
-            --header 'client_id: '$CLIENT_ID'' \
-            --header 'Authorization: Bearer '$token'')
+        # - name: Submit for review
+        #   script: |
+        #     res=$(curl --location --request POST 'https://connect-api.cloud.huawei.com/api/publish/v2/app-submit?appId='$APP_ID'' \
+        #     --header 'client_id: '$CLIENT_ID'' \
+        #     --header 'Authorization: Bearer '$token'')
 
-            code=$(echo $res | jq -r '.ret.code')
+        #     code=$(echo $res | jq -r '.ret.code')
 
-            if [ $code -eq 0 ]
-            then
-                echo "Submitted for review successfully."
-            else
-                echo $(echo $res | jq -r '.ret.msg')
-                exit 1
-            fi
+        #     if [ $code -eq 0 ]
+        #     then
+        #         echo "Submitted for review successfully."
+        #     else
+        #         echo $(echo $res | jq -r '.ret.msg')
+        #         exit 1
+        #     fi
 
       # email:
       #   recipients:
