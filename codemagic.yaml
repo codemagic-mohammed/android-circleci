@@ -60,7 +60,7 @@ workflows:
       scripts:
         - name: Publish to AppGallery
           script: |
-            artifactPath="~/clone/app/build/outputs/bundle/release/app-release.aab"
+            artifactPath="$CM_BUILD_OUTPUT_DIR/app-release.aab"
             echo "artifactPath= $artifactPath"
 
             #First get the accessToken
