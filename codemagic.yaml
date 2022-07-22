@@ -137,9 +137,14 @@ workflows:
           script: |
             startDate=$(date +%s)
             echo "APP_GALLERY_TOKEN: $APP_GALLERY_TOKEN"
+            if [[ "$APP_GALLERY_TOKEN" == null ]]
+            then
+                echo "AppGallery is null!"
+                exit 1
+            fi
 
             #While loop using timer
-            while [[ ! $(( $(date +%s) - $startDate )) -gt $((60*15)) && "$APP_GALLERY_TOKEN" -ne null ]]; do
+            while [ ! $(( $(date +%s) - $startDate )) -gt $((60*15)) ]; do
                 echo "Trying to submit for review..."
                 res=$(curl --location --request POST 'https://connect-api.cloud.huawei.com/api/publish/v2/app-submit?appId='$APP_ID'' \
                 --header 'client_id: '$CLIENT_ID'' \
