@@ -72,9 +72,9 @@ workflows:
                 "grant_type": "client_credentials"
             }')
 
-            token=$(echo $res | jq -r '.access_token')
+            EXPORT APP_GALLERY_TOKEN=$(echo $res | jq -r '.access_token')
 
-            if [[ "$token" == null ]]
+            if [[ "$APP_GALLERY_TOKEN" == null ]]
             then
                 echo $(echo $res | jq -r '.ret.msg')
                 exit 1
@@ -83,7 +83,7 @@ workflows:
             #Get the upload URL and upload your app
             res=$(curl --location --request GET 'https://connect-api.cloud.huawei.com/api/publish/v2/upload-url?appId='$APP_ID'&suffix='$SUFFIX'' \
             --header 'client_id: '$CLIENT_ID'' \
-            --header 'Authorization: Bearer '$token'')
+            --header 'Authorization: Bearer '$APP_GALLERY_TOKEN'')
 
             uploadUrl=$(echo $res | jq -r '.uploadUrl')
             authCode=$(echo $res | jq -r '.authCode')
@@ -97,7 +97,7 @@ workflows:
 
             res=$(curl --location --request POST 'https://developerfile7.hicloud.com:443/FileServer/uploadFile' \
             --header 'client_id: '$CLIENT_ID'' \
-            --header 'Authorization: Bearer '$token'' \
+            --header 'Authorization: Bearer '$APP_GALLERY_TOKEN'' \
             --form 'authCode="'$authCode'"' \
             --form 'fileCount="1"' \
             --form 'file=@"'$artifactPath'"')
@@ -113,7 +113,7 @@ workflows:
 
             res=$(curl --location --request PUT 'https://connect-api.cloud.huawei.com/api/publish/v2/app-file-info?appId='$APP_ID'' \
             --header 'client_id: '$CLIENT_ID'' \
-            --header 'Authorization: Bearer '$token'' \
+            --header 'Authorization: Bearer '$APP_GALLERY_TOKEN'' \
             --header 'Content-Type: application/json' \
             --data-raw '{
                 "fileType": 5,
@@ -133,21 +133,30 @@ workflows:
                 exit 1
             fi
 
-        # - name: Submit for review
-        #   script: |
-        #     res=$(curl --location --request POST 'https://connect-api.cloud.huawei.com/api/publish/v2/app-submit?appId='$APP_ID'' \
-        #     --header 'client_id: '$CLIENT_ID'' \
-        #     --header 'Authorization: Bearer '$token'')
+        - name: Submit for review
+          script: |
+            startDate=$(date +%s)
+            echo "APP_GALLERY_TOKEN: $APP_GALLERY_TOKEN"
 
-        #     code=$(echo $res | jq -r '.ret.code')
+            #While loop using timer
+            while ! [ $(( $(date +%s) - $startDate )) -gt $((60*15)) ]; do
+                echo "Trying to submit for review..."
+                res=$(curl --location --request POST 'https://connect-api.cloud.huawei.com/api/publish/v2/app-submit?appId='$APP_ID'' \
+                --header 'client_id: '$CLIENT_ID'' \
+                --header 'Authorization: Bearer '$APP_GALLERY_TOKEN'')
+                code=$(echo $res | jq -r '.ret.code')
 
-        #     if [ $code -eq 0 ]
-        #     then
-        #         echo "Submitted for review successfully."
-        #     else
-        #         echo $(echo $res | jq -r '.ret.msg')
-        #         exit 1
-        #     fi
+                if [ $code -eq 0 ]
+                then
+                    echo "Submitted for review successfully."
+                    break
+                else
+                    echo $(echo $res | jq -r '.ret.msg')
+                fi
+
+                echo "Sleeping for 1 minutes..."
+                sleep $((60*1))
+            done
 
       # email:
       #   recipients:
@@ -157,7 +166,7 @@ workflows:
       #     failure: false
       slack:
         channel: "#test-codemagic1"
-        notify_on_build_start: true
+        notify_on_build_start: false
     # google_play: # For Android app
     #   credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS # Contents of the JSON key file for Google Play service account saved as a secure environment variable
     #   track: internal # Name of the track internal, alpha, beta, production, internal app sharing, or your custom track name
