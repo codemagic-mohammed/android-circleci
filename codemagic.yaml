@@ -60,6 +60,9 @@ workflows:
       scripts:
         - name: Publish to AppGallery
           script: |
+            artifactPath="~/clone/app/build/outputs/bundle/release/app-release.aab"
+            echo "artifactPath= $artifactPath"
+
             #First get the accessToken
             res=$(curl --location --request POST 'https://connect-api.cloud.huawei.com/api/oauth2/v1/token' \
             --header 'Content-Type: application/json' \
@@ -97,7 +100,7 @@ workflows:
             --header 'Authorization: Bearer '$token'' \
             --form 'authCode="'$authCode'"' \
             --form 'fileCount="1"' \
-            --form 'file=@""'$CM_BUILD_DIR'/app/build/outputs/bundle/release/app-release.aab""')
+            --form 'file=@"'$artifactPath'"')
 
             fileDestUrl=$(echo $res | jq -r '.result.UploadFileRsp.fileInfoList[0].fileDestUlr')
             code=$(echo $res | jq -r '.result.resultCode')
