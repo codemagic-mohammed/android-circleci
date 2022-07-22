@@ -71,7 +71,8 @@ workflows:
                 "grant_type": "client_credentials"
             }')
 
-            export APP_GALLERY_TOKEN=$(echo $res | jq -r '.access_token')
+            APP_GALLERY_TOKEN=$(echo $res | jq -r '.access_token')
+            echo "APP_GALLERY_TOKEN=$APP_GALLERY_TOKEN" >> $CM_ENV
 
             if [[ "$APP_GALLERY_TOKEN" == null ]]
             then
@@ -138,7 +139,7 @@ workflows:
             echo "APP_GALLERY_TOKEN: $APP_GALLERY_TOKEN"
 
             #While loop using timer
-            while ! [ $(( $(date +%s) - $startDate )) -gt $((60*15)) ]; do
+            while ! [[ $(( $(date +%s) - $startDate )) -gt $((60*15)) && "$APP_GALLERY_TOKEN" -ne null]]; do
                 echo "Trying to submit for review..."
                 res=$(curl --location --request POST 'https://connect-api.cloud.huawei.com/api/publish/v2/app-submit?appId='$APP_ID'' \
                 --header 'client_id: '$CLIENT_ID'' \
