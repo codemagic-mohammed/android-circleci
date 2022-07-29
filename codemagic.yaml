@@ -191,9 +191,9 @@ workflows:
       groups:
         # - google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
         - keys # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
+        - app_gallery # <-- (Includes CLIENT_ID, CLIENT_SECRET, APP_ID)
       android_signing:
         - codemagic_test
-      node: latest
     triggering:
       events:
         - push
@@ -206,12 +206,14 @@ workflows:
           #!/usr/bin/env zsh
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
       - chmod +x gradlew
-      - name: Build, increment the build number and publish to the Play store
-        script: bundle install && bundle exec fastlane release
+      # - name: Build, increment the build number and publish to the Play store
+      #   script: bundle install && bundle exec fastlane release
       - name: Publish to the AppGallery store
         script: |
+          rm Gemfile.lock
           fastlane add_plugin huawei_appgallery_connect
-          bundle install && bundle exec fastlane huawei
+          bundle install
+          bundle exec fastlane huawei
 
     artifacts:
       - app/build/outputs/**/**/*.aab
