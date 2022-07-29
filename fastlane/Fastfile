@@ -37,7 +37,7 @@ platform :android do
   end
 
 
-  desc "Build, increment the build number and publish to the store"
+  desc "Build, increment the build number and publish to the Play store"
   lane :release do
     gradle(task: "clean assembleRelease")
     g_key = ENV["GCLOUD_SERVICE_ACCOUNT_CREDENTIALS"].strip
@@ -61,5 +61,32 @@ platform :android do
       skip_upload_apk: true,
       json_key_data: "#{g_key}"
     )  
+  end
+
+  desc "Publish to the AppGallery store"
+  lane :huawei do
+    gradle(
+      # task: 'assemble', #only apk
+      task: 'bundle', #apk & aab
+      build_type: 'Release',
+      print_command: true,
+    )
+
+    huawei_appgallery_connect(
+    client_id: "#{ENV["CLIENT_ID"]}",
+    client_secret: "#{ENV["CLIENT_SECRET"]}",
+    app_id: "#{ENV["APP_ID"]}",
+    apk_path: "./app/build/outputs/bundle/release/app-release.aab",
+    
+    # Optional, Parameter beyond this are optional
+    
+    # If you are facing errors when submitting for review, increase the delay time before submitting the app for review using this option:
+    delay_before_submit_for_review: 20,
+
+    # if you're uploading aab instead of apk, specify is_aab to true and specify path to aab file on apk_path
+    is_aab: true, 
+  
+    submit_for_review: true,
+)
   end
 end

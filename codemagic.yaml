@@ -23,7 +23,7 @@ workflows:
         - push
       branch_patterns:
         - pattern: "*"
-          include: true
+          include: false
       cancel_previous_builds: false
     scripts:
       - name: Set up key.properties file for code signing
@@ -136,7 +136,6 @@ workflows:
         - name: Submit for review
           script: |
             startDate=$(date +%s)
-            echo "APP_GALLERY_TOKEN: $APP_GALLERY_TOKEN"
             if [[ "$APP_GALLERY_TOKEN" == null ]]
             then
                 echo "AppGallery is null!"
@@ -154,7 +153,7 @@ workflows:
                 if [ $code -eq 0 ]
                 then
                     echo "Submitted for review successfully."
-                    break
+                    exit 0
                 else
                     echo $(echo $res | jq -r '.ret.msg')
                 fi
@@ -162,6 +161,8 @@ workflows:
                 echo "Sleeping for 1 minutes..."
                 sleep $((60*1))
             done
+
+            exit 1
 
       # email:
       #   recipients:
@@ -183,6 +184,9 @@ workflows:
     name: Android Fastlane
     max_build_duration: 60
     instance_type: linux_x2
+    cache:
+      cache_paths:
+        - $HOME/.gradle/caches
     environment:
       groups:
         # - google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
@@ -195,18 +199,19 @@ workflows:
         - push
       branch_patterns:
         - pattern: "*"
-          include: false
+          include: true
     scripts:
       - name: Set up local properties
         script: |
           #!/usr/bin/env zsh
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
-      - bundle install
-      - name: Build, increment the build number and publish to the store
+      - chmod +x gradlew
+      - name: Build, increment the build number and publish to the Play store
+        script: bundle install && bundle exec fastlane release
+      - name: Publish to the AppGallery store
         script: |
-          #!/usr/bin/env zsh
-          chmod +x gradlew # because the gradlew was denied
-          bundle exec fastlane release
+          fastlane add_plugin huawei_appgallery_connect
+          bundle install && bundle exec fastlane huawei
 
     artifacts:
       - app/build/outputs/**/**/*.aab

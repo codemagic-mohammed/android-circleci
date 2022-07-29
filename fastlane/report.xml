@@ -5,12 +5,17 @@
     
     
       
-      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.0025733">
+      <testcase classname="fastlane.lanes" name="0: default_platform" time="0.002622">
         
       </testcase>
     
       
-      <testcase classname="fastlane.lanes" name="1: clean assembleRelease" time="25.7982898">
+      <testcase classname="fastlane.lanes" name="1: bundleRelease" time="3.3648953">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="2: huawei_appgallery_connect" time="166.1713121">
         
       </testcase>
     
