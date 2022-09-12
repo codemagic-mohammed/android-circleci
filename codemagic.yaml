@@ -192,9 +192,7 @@ workflows:
         # - google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
         # - keys # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
         # - app_gallery # <-- (Includes CLIENT_ID, CLIENT_SECRET, APP_ID)
-        - amazon_store # <-- (Includes CLIENT_ID, CLIENT_SECRET)
-      vars:
-        APP_ID: com.mohammed.androidcodemagictest
+        - amazon_store # <-- (Includes CLIENT_ID, CLIENT_SECRET, APP_ID)
       android_signing:
         - codemagic_test
     triggering:
