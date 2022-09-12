@@ -190,8 +190,11 @@ workflows:
     environment:
       groups:
         # - google_play # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
-        - keys # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
-        - app_gallery # <-- (Includes CLIENT_ID, CLIENT_SECRET, APP_ID)
+        # - keys # <-- (Includes GCLOUD_SERVICE_ACCOUNT_CREDENTIALS - Put your google-services.json here)
+        # - app_gallery # <-- (Includes CLIENT_ID, CLIENT_SECRET, APP_ID)
+        - amazon_store # <-- (Includes CLIENT_ID, CLIENT_SECRET)
+      vars:
+        APP_ID: com.mohammed.androidcodemagictest
       android_signing:
         - codemagic_test
     triggering:
@@ -208,12 +211,18 @@ workflows:
       - chmod +x gradlew
       # - name: Build, increment the build number and publish to the Play store
       #   script: bundle install && bundle exec fastlane release
-      - name: Publish to the AppGallery store
+      # - name: Publish to the AppGallery store
+      #   script: |
+      #     rm Gemfile.lock
+      #     fastlane add_plugin huawei_appgallery_connect
+      #     bundle install
+      #     bundle exec fastlane huawei
+      - name: Publish to the Amazon appStore
         script: |
           rm Gemfile.lock
-          fastlane add_plugin huawei_appgallery_connect
+          fastlane add_plugin amazon_app_submission
           bundle install
-          bundle exec fastlane huawei
+          bundle exec fastlane amazon
 
     artifacts:
       - app/build/outputs/**/**/*.aab
