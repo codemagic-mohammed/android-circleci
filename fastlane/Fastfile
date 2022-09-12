@@ -93,8 +93,8 @@ platform :android do
   desc "Publish to the Amazon appstore"
   lane :amazon do
     gradle(
-      # task: 'assemble', #only apk
-      task: 'bundle', #apk & aab
+      task: 'assemble', #only apk
+      # task: 'bundle', #apk & aab
       build_type: 'Release',
       print_command: true,
     )
@@ -104,9 +104,9 @@ platform :android do
     client_secret: "#{ENV["CLIENT_SECRET"]}",
     app_id: "#{ENV["APP_ID"]}",
     # Optional
-    apk_path: "./app/build/outputs/bundle/release/app-release.aab",
+    apk_path: "./app/build/outputs/apk/release/app-release.apk",
     upload_apk: true,
-    submit_for_review: false
+    submit_for_review: true
   )
   end
 end
