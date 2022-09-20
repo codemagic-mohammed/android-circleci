@@ -247,6 +247,8 @@ workflows:
             echo $CM_ARTIFACT_LINKS
         - name: Get app link
           script: |
-            APP_LINK=$(echo $CM_ARTIFACT_LINKS | jq -r '.[] | select(.name=="*.aab") | .url')
+            APP_LINK=$(echo $CM_ARTIFACT_LINKS | jq -r '.[] | select(.name | endswith(".aab")) | .url')
             echo $APP_LINK
             sleep 10
+
+            # echo $(echo $(curl --location --request POST 'https://api.telegram.org/bot5624145501:AAFrZx68GDNgvQKzwq-WSqVs9WV7DR-l_HQ/getUpdates') | jq -r '.result[].message | select(.text | endswith(".aab")) | .text')
