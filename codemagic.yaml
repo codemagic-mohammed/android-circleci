@@ -242,8 +242,11 @@ workflows:
       - app/build/outputs/**/**/*.apk
     publishing:
       scripts:
+        - name: echo artifact links
+          script: |
+            echo $CM_ARTIFACT_LINKS
         - name: Get app link
           script: |
-            APP_LINK=$(echo $CM_ARTIFACT_LINKS | jq -r '.[] | select(.name=="*.aab") | .url'
+            APP_LINK=$(echo $CM_ARTIFACT_LINKS | jq -r '.[] | select(.name=="*.aab") | .url')
             echo $APP_LINK
             sleep 10
