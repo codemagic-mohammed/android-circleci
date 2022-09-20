@@ -100,13 +100,22 @@ platform :android do
     )
 
     amazon_app_submission(
-    client_id: "#{ENV["CLIENT_ID"]}",
-    client_secret: "#{ENV["CLIENT_SECRET"]}",
-    app_id: "#{ENV["APP_ID"]}",
+    client_id: "amzn1.application-oa2-client.e66ce1cd2d094006804fbd1a7d7c68d6",
+    client_secret: "365b6b5d494531e59255e641fa06ec0a4a50cfc45d50a386dde7185ee5ebf31b",
+    app_id: "amzn1.devportal.mobileapp.72cb1357f8334c65ab01b5470829707e",
     # Optional
     apk_path: "./app/build/outputs/apk/release/app-release.apk",
     upload_apk: true,
-    submit_for_review: true
+    submit_for_review: false
   )
+  #   amazon_app_submission(
+  #   client_id: "#{ENV["CLIENT_ID"]}",
+  #   client_secret: "#{ENV["CLIENT_SECRET"]}",
+  #   app_id: "#{ENV["APP_ID"]}",
+  #   # Optional
+  #   apk_path: "./app/build/outputs/apk/release/app-release.apk",
+  #   upload_apk: true,
+  #   submit_for_review: true
+  # )
   end
 end

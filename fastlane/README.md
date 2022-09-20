@@ -47,13 +47,13 @@ Submit a new Beta Build to Crashlytics Beta
 
 Build, increment the build number and publish to the Play store
 
-### android huawei
+### android amazon
 
 ```sh
-[bundle exec] fastlane android huawei
+[bundle exec] fastlane android amazon
 ```
 
-Publish to the AppGallery store
+Publish to the Amazon appstore
 
 ----
 
